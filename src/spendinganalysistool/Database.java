@@ -18,7 +18,7 @@ public class Database {
     
     public Database() {
         try {
-            con = DriverManager.getConnection("jdbc:mysql://localhost:3306/spending_analysis", Config.DB_USER, Config.DB_PASSWORD);
+            con = DriverManager.getConnection(Config.DB_URL, Config.DB_USER, Config.DB_PASSWORD);
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -40,13 +40,13 @@ public class Database {
             return e.getMessage();
         } finally {
  
-			if (stmt != null) {
-				stmt.close();
-			}
- 
-			if (con != null) {
-				con.close();
-			}
+            if (stmt != null) {
+                stmt.close();
+            }
+
+            if (con != null) {
+                con.close();
+            }
         }
         
         return category;
