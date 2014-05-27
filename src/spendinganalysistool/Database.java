@@ -11,10 +11,6 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- *
- * Connect to database and perform queries
- */
 public class Database {
     
     Connection con = null;
@@ -79,23 +75,17 @@ public class Database {
         return categories;
     }
     
-    
-    public String getCategory(String source) throws SQLException {
-        
+    public void addSourceUnderCategory(String source, String category) throws SQLException {
         PreparedStatement stmt = null;
-        String sql = "SELECT c.name FROM source s JOIN category c ON s.category_id = c.id WHERE s.name = ?";
-        String category = "";
-        
+        String sql = "INSERT INTO source VALUES (null, ?, (SELECT id FROM category WHERE name = ?))";
         try {
             stmt = con.prepareStatement(sql);
             stmt.setString(1, source);
-            ResultSet rs = stmt.executeQuery();
-            rs.next();
-            category = rs.getString("name");
+            stmt.setString(2, category);
+            stmt.executeUpdate();
         } catch (SQLException e) {
-            return e.getMessage();
-        } finally {
- 
+            e.printStackTrace();
+        } finally { 
             if (stmt != null) {
                 stmt.close();
             }
@@ -104,7 +94,35 @@ public class Database {
                 con.close();
             }
         }
-        
-        return category;
+    }
+    
+    public void addSourceAndCategory(String source, String category) throws SQLException {
+        PreparedStatement insertSource = null;
+        PreparedStatement insertCategory = null;                
+        String sqlCategory = "INSERT INTO category VALUES (null, ?)";
+        String sqlSource = "INSERT INTO source VALUES (null, ?, (SELECT id FROM category WHERE name = ?))";
+        try {
+            insertCategory = con.prepareStatement(sqlCategory);
+            insertCategory.setString(1, category);
+            insertCategory.executeUpdate();
+            insertSource = con.prepareStatement(sqlSource);
+            insertSource.setString(1, source);
+            insertSource.setString(2, category);
+            insertSource.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally { 
+            if (insertCategory != null) {
+                insertCategory.close();
+            }
+            
+            if (insertSource != null) {
+                insertSource.close();
+            }
+
+            if (con != null) {
+                con.close();
+            }
+        }
     }
 }

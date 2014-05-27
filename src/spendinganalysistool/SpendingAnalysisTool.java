@@ -3,10 +3,12 @@ package spendinganalysistool;
 
 import java.util.List;
 import java.sql.SQLException;
+import java.util.Scanner;
 
 public class SpendingAnalysisTool {
 
     Database db = null;
+    Scanner in = new Scanner(System.in);
     
     public static void main(String[] args) {          
         SpendingAnalysisTool tool = new SpendingAnalysisTool(args[0]);        
@@ -35,12 +37,27 @@ public class SpendingAnalysisTool {
             boolean result = searchSource(row[0], sources);
             
             if (!result) {
-                System.out.println("Please choose a category for " + row[0] + " by entering the "
-                        + "number of a current category, or 0 to create a new category.");
+                System.out.println("Please choose a category for " + row[0] + " or enter a new category.");
                 for (String cat : categories) {
-                    System.out.println(cat);
+                    System.out.print(cat + " ");
                 }
+                System.out.println();
                 
+                String category;
+                category = in.next();
+                if (!searchCategory(category, categories)) {
+                    try {
+                        db.addSourceAndCategory(row[0], category);
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    try {
+                        db.addSourceUnderCategory(row[0], category);
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                }                      
             }
         }                
     }
@@ -48,6 +65,16 @@ public class SpendingAnalysisTool {
     private boolean searchSource(String source, List<String> sources) {
         for (String s : sources) {
             if (source.equals(s)) {
+                return true;
+            }
+        }        
+        
+        return false;
+    }    
+    
+    private boolean searchCategory(String category, List<String> categories) {
+        for (String c : categories) {
+            if (category.equals(c)) {
                 return true;
             }
         }        
