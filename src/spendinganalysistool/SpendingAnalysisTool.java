@@ -4,6 +4,7 @@ package spendinganalysistool;
 import java.util.List;
 import java.sql.SQLException;
 import java.util.Scanner;
+import spendinganalysistool.DBFactory;
 
 public class SpendingAnalysisTool {
 
@@ -18,7 +19,7 @@ public class SpendingAnalysisTool {
         
         CsvReader csvReader = new CsvReader(file);
         List<String[]> csvData = csvReader.parse();
-        db = new Database();
+        db = DBFactory.createDB("mysql");
         run(csvData);
     }
     
@@ -59,7 +60,13 @@ public class SpendingAnalysisTool {
                     }
                 }                      
             }
-        }                
+        }  
+        
+        try {
+            db.closeConn(); 
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }        
     }
     
     private boolean searchSource(String source, List<String> sources) {
